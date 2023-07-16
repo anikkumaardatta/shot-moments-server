@@ -1,12 +1,13 @@
 const createError = require("http-errors");
 const User = require("../models/userModel");
 const { successResponse } = require("./responseController");
+const { default: mongoose } = require("mongoose");
 
 const getUsers = async (req, res, next) => {
   try {
     const search = req.query.search || "";
     const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 1;
+    const limit = Number(req.query.limit) || 5;
 
     const searchRegExp = new RegExp(".*" + search + ".*", "i");
 
@@ -32,6 +33,7 @@ const getUsers = async (req, res, next) => {
       statusCode: 200,
       message: "Users returned successfully.",
       payload: {
+        totalUser: count,
         users,
         pagination: {
           totalPages: Math.ceil(count / limit),
@@ -46,6 +48,29 @@ const getUsers = async (req, res, next) => {
   }
 };
 
+const getUserById = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const option = { password: 0, __v: 0 };
+
+    const user = await User.findById(id, option);
+    if (!user) throw next(createError(404, "User doesn't exist!"));
+    return successResponse(res, {
+      statusCode: 200,
+      message: "User were returned successfully.",
+      payload: {
+        user,
+      },
+    });
+  } catch (error) {
+    if (error instanceof mongoose.Error) {
+      next(createError(400, "Invalid User id!"));
+      return
+    }
+    next(error)
+  }
+};
 module.exports = {
   getUsers,
+  getUserById,
 };
