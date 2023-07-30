@@ -21,10 +21,8 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use( "/api/users",userRouter)
-app.use( "/api/seed",seedRouter)
-
-
+app.use("/api/users", userRouter);
+app.use("/api/seed", seedRouter);
 
 app.get("/", (req, res) => {
   res.status(200).send({
@@ -37,9 +35,6 @@ app.get("/testing", (req, res) => {
     message: "SHOT MOMENTS Server running successfully.",
   });
 });
-
-
-
 
 app.get("/api/users", (req, res) => {
   res.status(200).send({
@@ -55,8 +50,8 @@ app.use((req, res, next) => {
 app.use((err, req, res, next) => {
   return errorHandler(res, {
     statusCode: err.status,
-    message: err.message
-  })
+    message: err.message,
+  });
 });
 
 module.exports = app;
